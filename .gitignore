@@ -1,0 +1,135 @@
+########################################
+# Python
+########################################
+
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.pyd
+*.dll
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+########################################
+# Conda
+########################################
+
+# Conda environments (never commit)
+conda-env/
+.env/
+*.conda
+*.lock
+
+# Conda cache
+.conda/
+.condarc
+
+########################################
+# Jupyter
+########################################
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Jupyter runtime files
+.jupyter/
+.jupyterlab/
+
+########################################
+# VS Code
+########################################
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+########################################
+# JetBrains (PyCharm, IntelliJ, etc.)
+########################################
+
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+########################################
+# OS-specific
+########################################
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+########################################
+# Logs & runtime
+########################################
+
+*.log
+logs/
+*.pid
+
+########################################
+# Environment variables / secrets
+########################################
+
+.env
+.env.*
+*.env
+
+########################################
+# Data files (explicitly ignored)
+########################################
+
+training_data.csv
+
+########################################
+# API / ML artifacts
+########################################
+
+# Model artifacts
+models/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+*.joblib
+*.pkl
+
+# Temporary experiment outputs
+runs/
+wandb/
+mlruns/
+
+########################################
+# Misc
+########################################
+
+.cache/
+.tmp/
+tmp/
