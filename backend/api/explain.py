@@ -2,8 +2,6 @@ from fastapi import APIRouter, HTTPException
 from backend.api.schemas import PredictionRequest
 from backend.api.schemas import ExplainabilityResponse
 from backend.services.explainability import explain_toxicity
-from backend.services import summarize_with_llm
-from backend.services.core_utils.standardization import standardize_smiles
 from backend.services.core_utils.mol import mol_from_canonical_smiles
 from backend.services.prediction_pipeline import predict_from_smiles
 

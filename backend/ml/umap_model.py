@@ -1,6 +1,7 @@
 import joblib
 import numpy as np
-from typing import Tuple
+from pathlib import Path
+from typing import Tuple, Optional
 
 
 class UMAPProjector:
@@ -9,13 +10,23 @@ class UMAPProjector:
     Responsible ONLY for projection (transform), never fit.
     """
 
-    def __init__(self, model_path: str):
+    def __init__(self, model_path: Optional[str] = None):
         """
         Parameters
         ----------
-        model_path : str
+        model_path : str, optional
             Path to serialized UMAP model (.pkl)
+            If None, model must be loaded later via load()
         """
+        self.umap = None
+        if model_path is not None:
+            self.load(model_path)
+
+    def load(self, model_path: str):
+        """Load UMAP model from file."""
+        path = Path(model_path)
+        if not path.exists():
+            raise FileNotFoundError(f"UMAP model not found: {model_path}")
         try:
             self.umap = joblib.load(model_path)
         except Exception as e:
@@ -28,22 +39,27 @@ class UMAPProjector:
         Parameters
         ----------
         features : np.ndarray
-            Shape (n_features,)
+            Shape (1, n_features) or (n_features,)
 
         Returns
         -------
         (x, y) : Tuple[float, float]
             2D UMAP coordinates
         """
-        if features.ndim != 1:
+        if self.umap is None:
+            raise RuntimeError("UMAP model not loaded. Call load() first.")
+
+        # Ensure 2D input
+        if features.ndim == 1:
+            features = features.reshape(1, -1)
+        elif features.ndim == 2 and features.shape[0] == 1:
+            pass  # Already correct shape
+        else:
             raise ValueError(
-                f"Expected 1D feature vector, got shape {features.shape}"
+                f"Expected 1D or (1, n_features) array, got shape {features.shape}"
             )
 
-        # UMAP expects 2D input: (n_samples, n_features)
-        features_2d = features.reshape(1, -1)
-
-        coords = self.umap.transform(features_2d)
+        coords = self.umap.transform(features)
 
         if coords.shape != (1, 2):
             raise RuntimeError(
@@ -53,11 +69,57 @@ class UMAPProjector:
         x, y = coords[0]
         return float(x), float(y)
 
+    def transform_batch(self, features: np.ndarray) -> np.ndarray:
+        """
+        Project multiple molecules into UMAP space.
+
+        Parameters
+        ----------
+        features : np.ndarray
+            Shape (n_samples, n_features)
+
+        Returns
+        -------
+        np.ndarray
+            Shape (n_samples, 2) - UMAP coordinates
+        """
+        if self.umap is None:
+            raise RuntimeError("UMAP model not loaded. Call load() first.")
+
+        if features.ndim != 2:
+            raise ValueError(f"Expected 2D array, got shape {features.shape}")
+
+        return self.umap.transform(features)
+
 
 # ------------------------------------------------------------------
-# Singleton instance (loaded once at startup)
+# Singleton instance (lazy loaded)
 # ------------------------------------------------------------------
 
-umap_projector = UMAPProjector(
-    model_path="backend/ml/models/umap.pkl"
-)
+_umap_projector: Optional[UMAPProjector] = None
+
+
+def get_umap_projector() -> UMAPProjector:
+    """Get or create the singleton UMAP projector."""
+    global _umap_projector
+    if _umap_projector is None:
+        model_path = Path("backend/ml/models/umap.pkl")
+        if model_path.exists():
+            _umap_projector = UMAPProjector(str(model_path))
+        else:
+            raise FileNotFoundError(
+                f"UMAP model not found: {model_path}. "
+                "Please run training first (see umap_play.ipynb)."
+            )
+    return _umap_projector
+
+
+# For backwards compatibility - lazy loading
+class _LazyUMAPProjector:
+    """Lazy proxy that loads UMAP model on first access."""
+
+    def __getattr__(self, name):
+        return getattr(get_umap_projector(), name)
+
+
+umap_projector = _LazyUMAPProjector()

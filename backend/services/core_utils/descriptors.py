@@ -1,11 +1,7 @@
-from turtle import pd
 import numpy as np
-from rdkit.Chem import Descriptors
+import pandas as pd
 from rdkit import Chem
-
-from skfp.fingerprints import (
-    MACCSFingerprint,
-)
+from rdkit.Chem import Descriptors
 
 final_desc_cols = ['MaxAbsEStateIndex',
  'MinAbsEStateIndex',
