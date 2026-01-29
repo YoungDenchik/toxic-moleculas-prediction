@@ -3,7 +3,10 @@
     "allow": [
       "Bash(python -c:*)",
       "Bash(python3:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm install ketcher-react ketcher-core ketcher-standalone)",
+      "Bash(npm install:*)"
     ]
   }
 }
