@@ -225,6 +225,7 @@
 # maccs_gen = MACCSFingerprint(n_jobs=-1)
 
 
+import joblib
 import numpy as np
 import pandas as pd
 from rdkit import Chem
@@ -233,9 +234,10 @@ from rdkit.Chem import Descriptors
 from skfp.fingerprints import MACCSFingerprint
 
 
-maccs_gen = MACCSFingerprint(n_jobs=-1)
+# maccs_gen = MACCSFingerprint(n_jobs=-1)
 
-# scaler = joblib.load("descriptor_scaler.joblib")
+# scaler_path = joblib.load("backend/ml/models/xgb_model.pkl")
+# scaler = scaler_path["scaler"]
 # model = joblib.load("tox_model.joblib")
 # umap_projector = joblib.load("umap.joblib")
 
@@ -287,15 +289,152 @@ def create_hybrid_features(
 
 def build_feature_vector(
     mol: Chem.Mol,
-    *,
-    maccs_gen: MACCSFingerprint,
-    scaler,
-    final_desc_cols: list[str],
+    # *,
+    # maccs_gen: MACCSFingerprint,
+    # scaler,
+    # final_desc_cols: list[str],
 ) -> pd.DataFrame:
     """
     Build full feature vector for ONE molecule.
     Output shape: (1, N_features)
     """
+
+    final_desc_cols = ['MaxAbsEStateIndex',
+    'MinAbsEStateIndex',
+    'MinEStateIndex',
+    'qed',
+    'SPS',
+    'MolWt',
+    'NumRadicalElectrons',
+    'MaxPartialCharge',
+    'MinPartialCharge',
+    'FpDensityMorgan1',
+    'AvgIpc',
+    'BalabanJ',
+    'Ipc',
+    'PEOE_VSA1',
+    'PEOE_VSA10',
+    'PEOE_VSA11',
+    'PEOE_VSA12',
+    'PEOE_VSA13',
+    'PEOE_VSA14',
+    'PEOE_VSA2',
+    'PEOE_VSA3',
+    'PEOE_VSA4',
+    'PEOE_VSA5',
+    'PEOE_VSA6',
+    'PEOE_VSA7',
+    'PEOE_VSA8',
+    'PEOE_VSA9',
+    'SMR_VSA1',
+    'SMR_VSA10',
+    'SMR_VSA2',
+    'SMR_VSA3',
+    'SMR_VSA4',
+    'SMR_VSA5',
+    'SMR_VSA6',
+    'SMR_VSA7',
+    'SMR_VSA9',
+    'SlogP_VSA1',
+    'SlogP_VSA10',
+    'SlogP_VSA11',
+    'SlogP_VSA12',
+    'SlogP_VSA2',
+    'SlogP_VSA3',
+    'SlogP_VSA4',
+    'SlogP_VSA7',
+    'SlogP_VSA8',
+    'TPSA',
+    'EState_VSA1',
+    'EState_VSA11',
+    'EState_VSA2',
+    'EState_VSA3',
+    'EState_VSA4',
+    'EState_VSA5',
+    'EState_VSA6',
+    'EState_VSA7',
+    'EState_VSA8',
+    'EState_VSA9',
+    'VSA_EState2',
+    'VSA_EState3',
+    'VSA_EState4',
+    'VSA_EState5',
+    'VSA_EState7',
+    'VSA_EState8',
+    'VSA_EState9',
+    'FractionCSP3',
+    'NHOHCount',
+    'NumAliphaticCarbocycles',
+    'NumAliphaticHeterocycles',
+    'NumAromaticCarbocycles',
+    'NumAromaticHeterocycles',
+    'NumAromaticRings',
+    'RingCount',
+    'MolLogP',
+    'fr_Al_COO',
+    'fr_Al_OH',
+    'fr_ArN',
+    'fr_Ar_COO',
+    'fr_Ar_NH',
+    'fr_Ar_OH',
+    'fr_C_O',
+    'fr_C_S',
+    'fr_HOCCN',
+    'fr_Imine',
+    'fr_NH1',
+    'fr_NH2',
+    'fr_N_O',
+    'fr_Ndealkylation1',
+    'fr_Ndealkylation2',
+    'fr_SH',
+    'fr_alkyl_carbamate',
+    'fr_allylic_oxid',
+    'fr_amidine',
+    'fr_aniline',
+    'fr_aryl_methyl',
+    'fr_azo',
+    'fr_barbitur',
+    'fr_benzodiazepine',
+    'fr_bicyclic',
+    'fr_dihydropyridine',
+    'fr_epoxide',
+    'fr_ester',
+    'fr_ether',
+    'fr_furan',
+    'fr_guanido',
+    'fr_hdrzine',
+    'fr_hdrzone',
+    'fr_imidazole',
+    'fr_imide',
+    'fr_ketone',
+    'fr_lactam',
+    'fr_lactone',
+    'fr_methoxy',
+    'fr_morpholine',
+    'fr_nitro',
+    'fr_oxazole',
+    'fr_oxime',
+    'fr_para_hydroxylation',
+    'fr_phos_acid',
+    'fr_piperdine',
+    'fr_piperzine',
+    'fr_priamide',
+    'fr_pyridine',
+    'fr_quatN',
+    'fr_sulfide',
+    'fr_sulfonamd',
+    'fr_sulfone',
+    'fr_term_acetylene',
+    'fr_tetrazole',
+    'fr_thiazole',
+    'fr_thiophene',
+    'fr_unbrch_alkane',
+    'fr_urea']
+
+    maccs_gen = MACCSFingerprint(n_jobs=-1)
+
+    scaler_path = joblib.load("backend/ml/models/xgb_model.pkl")
+    scaler = scaler_path["scaler"]
 
     # 1. MACCS
     X_maccs = get_maccs_for_mol(mol, maccs_gen)

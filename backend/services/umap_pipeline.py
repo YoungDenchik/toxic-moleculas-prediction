@@ -9,12 +9,7 @@ from backend.ml.model import model
 from skfp.fingerprints import MACCSFingerprint
 
 
-maccs_gen = MACCSFingerprint(n_jobs=-1)
-
-# scaler = joblib.load("descriptor_scaler.joblib")
-# model = joblib.load("tox_model.joblib")
-# umap_projector = joblib.load("umap.joblib")
-
+# maccs_gen = MACCSFingerprint(n_jobs=-1)
 
 
 def project_smiles_to_umap_with_prediction(smiles: str) -> Dict:
@@ -47,32 +42,32 @@ def project_smiles_to_umap_with_prediction(smiles: str) -> Dict:
     }
 
 
-# def project_smiles_to_umap_with_prediction(smiles: str) -> Dict:
-#     canonical, error = standardize_smiles(smiles)
-#     if error is not None:
-#         return {"ok": False, "error": error}
+def project_smiles_to_umap_with_prediction(smiles: str) -> Dict:
+    canonical, error = standardize_smiles(smiles)
+    if error is not None:
+        return {"ok": False, "error": error}
 
-#     mol = mol_from_canonical_smiles(canonical)
+    mol = mol_from_canonical_smiles(canonical)
 
-#     features = build_feature_vector(
-#         mol,
-#         maccs_gen=maccs_gen,
-#         scaler=scaler,
-#         final_desc_cols=final_desc_cols,
-#     )
+    features = build_feature_vector(
+        mol,
+        # maccs_gen=maccs_gen,
+        # scaler=scaler,
+        # final_desc_cols=final_desc_cols,
+    )
 
-#     prob = float(model.predict_proba(features)[0, 1])
-#     label = "toxic" if prob >= 0.5 else "non-toxic"
+    prob = float(model.predict_proba(features)[0, 1])
+    label = "toxic" if prob >= 0.5 else "non-toxic"
 
-#     x, y = umap_projector.transform(features)[0]
+    x, y = umap_projector.transform(features)[0]
 
-#     return {
-#         "ok": True,
-#         "canonical_smiles": canonical,
-#         "prediction": {
-#             "label": label,
-#             "probability": prob,
-#         },
-#         "x": float(x),
-#         "y": float(y),
-#     }
+    return {
+        "ok": True,
+        "canonical_smiles": canonical,
+        "prediction": {
+            "label": label,
+            "probability": prob,
+        },
+        "x": float(x),
+        "y": float(y),
+    }
