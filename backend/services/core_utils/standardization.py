@@ -1,6 +1,6 @@
 from typing import Optional, Tuple
 from rdkit import Chem
-from rdkit.Chem import rdMolStandardize
+from rdkit.Chem.MolStandardize import rdMolStandardize
 
 
 def standardize_smiles(
