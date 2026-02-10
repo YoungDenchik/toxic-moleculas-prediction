@@ -5,8 +5,7 @@ node_modules/
 dist/
 build/
 
-# Environment files
-.env
+# Environment files (keep .env for dev, ignore secrets)
 .env.local
 .env.*.local
 

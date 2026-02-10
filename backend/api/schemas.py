@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import List, Optional
 
 
 # ===== Request =====
@@ -89,6 +90,15 @@ class AnalyzeResponse(BaseModel):
     lipinski_pass: bool
 
     explainability: Optional[ExplainabilityResponse] = None
+
+
+class TrainingUmapPoint(BaseModel):
+    """UMAP point for training data visualization."""
+    id: str
+    x: float
+    y: float
+    label: Optional[int] = None
+    smiles: Optional[str] = None
 
 
 

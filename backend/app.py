@@ -4,10 +4,14 @@ Cardiotoxicity Prediction API
 FastAPI application for predicting cardiotoxicity from molecular SMILES.
 """
 
+from typing import List
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.api import predict, chemical_space, properties, analyze, explain
+from backend.api.schemas import TrainingUmapPoint
+from backend.services.umap_data import load_umap_training_data
 
 
 app = FastAPI(
@@ -43,6 +47,12 @@ def root():
 def health():
     """Health check endpoint."""
     return {"status": "healthy"}
+
+
+@app.get("/umap", response_model=List[TrainingUmapPoint], tags=["Chemical Space"])
+def get_umap():
+    """Get precomputed UMAP coordinates for training data visualization."""
+    return load_umap_training_data()
 
 
 if __name__ == "__main__":

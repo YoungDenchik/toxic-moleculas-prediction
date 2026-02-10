@@ -15,12 +15,15 @@ const structServiceProvider = new StandaloneStructServiceProvider();
 export function KetcherEditor({ onSmilesChange, initialSmiles }: KetcherEditorProps) {
   const ketcherRef = useRef<Ketcher | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const lastSmilesRef = useRef<string>("");
   const isSettingSmilesRef = useRef(false);
 
   const handleInit = useCallback((ketcher: Ketcher) => {
+    console.log("[KetcherEditor] Initialized");
     ketcherRef.current = ketcher;
     setIsReady(true);
+    setError(null);
 
     // Set initial SMILES if provided
     if (initialSmiles && initialSmiles.trim()) {
@@ -72,8 +75,43 @@ export function KetcherEditor({ onSmilesChange, initialSmiles }: KetcherEditorPr
     });
   }, [initialSmiles, isReady]);
 
+  const handleError = useCallback((message: string) => {
+    console.error("[KetcherEditor] Error:", message);
+    setError(message);
+  }, []);
+
   return (
     <div style={{ position: "relative" }}>
+      {!isReady && !error && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(255,255,255,0.9)",
+            zIndex: 10,
+            borderRadius: 12,
+          }}
+        >
+          Loading molecule editor...
+        </div>
+      )}
+      {error && (
+        <div
+          style={{
+            padding: 16,
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
+            borderRadius: 12,
+            color: "#dc2626",
+            marginBottom: 8,
+          }}
+        >
+          Editor error: {error}
+        </div>
+      )}
       <div
         style={{
           height: 450,
@@ -84,10 +122,10 @@ export function KetcherEditor({ onSmilesChange, initialSmiles }: KetcherEditorPr
         }}
       >
         <Editor
-          staticResourcesUrl=""
+          staticResourcesUrl="."
           structServiceProvider={structServiceProvider}
           onInit={handleInit}
-          errorHandler={(message) => console.error("Ketcher error:", message)}
+          errorHandler={handleError}
         />
       </div>
       <div style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>

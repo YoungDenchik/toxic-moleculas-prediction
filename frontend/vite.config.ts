@@ -25,4 +25,10 @@ export default defineConfig({
     // Include ketcher packages for optimization
     include: ['ketcher-react', 'ketcher-core', 'ketcher-standalone'],
   },
+  server: {
+    fs: {
+      // Allow serving files from node_modules for Ketcher static resources
+      allow: ['..', 'node_modules/ketcher-react'],
+    },
+  },
 })

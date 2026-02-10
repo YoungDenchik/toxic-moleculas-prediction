@@ -10,15 +10,18 @@ import { mockUmap } from "./mocks/umap";
 export default function App() {
   const [points, setPoints] = useState<UmapPoint[]>(mockUmap);
   const [loading, setLoading] = useState(true);
+  const [usingMockData, setUsingMockData] = useState(false);
 
   useEffect(() => {
     apiGetUmap()
       .then((data) => {
         setPoints(data);
+        setUsingMockData(false);
         setLoading(false);
       })
       .catch(() => {
         // If backend not available, use mock data
+        setUsingMockData(true);
         setLoading(false);
       });
   }, []);
@@ -122,7 +125,24 @@ export default function App() {
               Loading chemical space data...
             </div>
           ) : (
-            <MoleculeAnalyzer backgroundPoints={points} />
+            <>
+              {usingMockData && (
+                <div
+                  style={{
+                    padding: "8px 12px",
+                    marginBottom: 12,
+                    background: "#fef3c7",
+                    border: "1px solid #f59e0b",
+                    borderRadius: 8,
+                    fontSize: 13,
+                    color: "#92400e",
+                  }}
+                >
+                  Using mock data - backend unavailable. Start the backend server to see real chemical space data.
+                </div>
+              )}
+              <MoleculeAnalyzer backgroundPoints={points} />
+            </>
           )}
         </Section>
 

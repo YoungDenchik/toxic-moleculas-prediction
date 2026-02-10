@@ -17,7 +17,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.Dev
     ports:
       - "5173:5173"
     volumes:

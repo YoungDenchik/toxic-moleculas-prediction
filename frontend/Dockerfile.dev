@@ -12,6 +12,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Default API URL - browser will call this URL directly
+# Override with: docker run -e VITE_API_BASE_URL=http://your-backend:8000
+ENV VITE_API_BASE_URL=http://localhost:8000
+
 # Expose Vite dev server port
 EXPOSE 5173
 

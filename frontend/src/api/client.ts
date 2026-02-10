@@ -10,6 +10,10 @@ import type {
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
 
+// Debug: check what URL is being used
+console.log("[API] VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
+console.log("[API] BASE URL:", BASE || "(empty - using same origin)");
+
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
     ...options,
