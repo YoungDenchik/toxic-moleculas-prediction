@@ -35,6 +35,14 @@ npm install
 npm run dev
 ```
 
+### Testing
+```bash
+cd backend
+pytest                    # Run all tests
+pytest tests/test_predict.py  # Run specific test file
+pytest -v                 # Verbose output
+```
+
 ### Frontend Commands
 ```bash
 npm run dev      # Start Vite dev server
@@ -48,6 +56,8 @@ npm run preview  # Preview production build
 ### Backend (`backend/`)
 - **Framework:** FastAPI with Uvicorn
 - **Entry point:** `app.py`
+- **Configuration:** `config.py` - Centralized configuration (paths, thresholds, CORS)
+- **Exceptions:** `exceptions.py` - Custom API exceptions
 
 **API Routers (`api/`):**
 - `predict.py` - `/predict` - SMILES → toxic/non-toxic prediction
@@ -57,22 +67,29 @@ npm run preview  # Preview production build
 - `explain.py` - `/explain/toxicity` - Structural alerts and risk factors
 
 **Service Layer (`services/`):**
+- `molecule_service.py` - Centralized molecule processing (standardization, features, prediction)
 - `prediction_pipeline.py` - End-to-end prediction workflow
 - `umap_pipeline.py` - UMAP projection with predictions
 - `lipinski_pipeline.py` - Physicochemical property analysis
 - `explainability.py` - Structural alert detection
+- `umap_data.py` - UMAP training data loading
 
 **Core Utilities (`services/core_utils/`):**
 - `standardization.py` - SMILES canonicalization
 - `mol.py` - RDKit molecule creation
 - `features.py` - Feature vector building (167 MACCS + 130 descriptors = 297 total)
-- `descriptors.py` - RDKit descriptor computation
-- `fingerprints.py` - MACCS fingerprint generation
+- `descriptors.py` - Descriptor column configuration
 
 **ML Models (`ml/`):**
 - `model.py` - XGBoost classifier wrapper (lazy loading singleton)
 - `umap_model.py` - UMAP projector wrapper (lazy loading singleton)
-- Serialized models in `ml/models/`: `xgb_model.pkl`, `umap.pkl`, `desc_scaler.pkl`
+- Serialized models in `ml/models/`: `xgb_model.pkl`, `umap.pkl`
+
+**Tests (`tests/`):**
+- `conftest.py` - Pytest fixtures
+- `test_health.py` - Health endpoint tests
+- `test_predict.py` - Prediction endpoint tests
+- `test_properties.py` - Properties endpoint tests
 
 ### Frontend (`frontend/`)
 - **Framework:** React 19 + TypeScript + Vite
@@ -100,7 +117,13 @@ SMILES Input → Standardization → Mol Object → Feature Extraction (297 dims
 - **Chemistry:** RDKit, scikit-fingerprints
 - **ML:** XGBoost, scikit-learn, UMAP-learn
 - **Frontend:** Ketcher (molecular editor), Plotly (visualization)
+- **Testing:** pytest, httpx
 
 ## Environment Variables
 
-- `VITE_API_BASE_URL` - Backend URL for frontend API calls
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CORS_ORIGINS` | Comma-separated allowed origins | `http://localhost:5173,http://localhost:3000,http://localhost:8000` |
+| `VITE_API_BASE_URL` | Backend URL for frontend | - |
+
+See `.env.example` for configuration template.

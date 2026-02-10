@@ -6,8 +6,9 @@ Loads and caches precomputed UMAP coordinates for training data.
 
 import csv
 from functools import lru_cache
-from pathlib import Path
 from typing import List, Dict, Any
+
+from backend.config import UMAP_COORDS_PATH
 
 
 @lru_cache(maxsize=1)
@@ -22,10 +23,8 @@ def load_umap_training_data() -> List[Dict[str, Any]]:
     - label: 1 if Toxic, 0 if Non-toxic
     - smiles: molecule SMILES string
     """
-    csv_path = Path(__file__).parent.parent / "ml" / "models" / "umap_coords.csv"
-
     points = []
-    with open(csv_path, "r", encoding="utf-8") as f:
+    with open(UMAP_COORDS_PATH, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for idx, row in enumerate(reader):
             points.append({

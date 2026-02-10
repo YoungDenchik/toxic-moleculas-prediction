@@ -1,17 +1,16 @@
 import joblib
 import numpy as np
 import pandas as pd
-from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 
 from skfp.fingerprints import MACCSFingerprint
 
 from backend.services.core_utils.descriptors import final_desc_cols
+from backend.config import XGB_MODEL_PATH
 
 
 # Load artifacts once at module level
-_ARTIFACTS_DIR = Path("backend/ml/models")
 _maccs_gen = MACCSFingerprint(n_jobs=-1)
 _scaler = None
 
@@ -20,13 +19,12 @@ def _get_scaler():
     """Lazily load scaler to avoid errors if model file doesn't exist yet."""
     global _scaler
     if _scaler is None:
-        scaler_path = _ARTIFACTS_DIR / "xgb_model.pkl"
-        if scaler_path.exists():
-            package = joblib.load(scaler_path)
+        if XGB_MODEL_PATH.exists():
+            package = joblib.load(XGB_MODEL_PATH)
             _scaler = package["scaler"]
         else:
             raise FileNotFoundError(
-                f"Model file not found: {scaler_path}. "
+                f"Model file not found: {XGB_MODEL_PATH}. "
                 "Please run training first."
             )
     return _scaler

@@ -3,6 +3,8 @@ import numpy as np
 from pathlib import Path
 from typing import Tuple, Optional
 
+from backend.config import UMAP_MODEL_PATH
+
 
 class UMAPProjector:
     """
@@ -103,12 +105,11 @@ def get_umap_projector() -> UMAPProjector:
     """Get or create the singleton UMAP projector."""
     global _umap_projector
     if _umap_projector is None:
-        model_path = Path("backend/ml/models/umap.pkl")
-        if model_path.exists():
-            _umap_projector = UMAPProjector(str(model_path))
+        if UMAP_MODEL_PATH.exists():
+            _umap_projector = UMAPProjector(str(UMAP_MODEL_PATH))
         else:
             raise FileNotFoundError(
-                f"UMAP model not found: {model_path}. "
+                f"UMAP model not found: {UMAP_MODEL_PATH}. "
                 "Please run training first (see umap_play.ipynb)."
             )
     return _umap_projector

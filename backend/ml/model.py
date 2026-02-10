@@ -3,6 +3,8 @@ import numpy as np
 from pathlib import Path
 from typing import Optional
 
+from backend.config import XGB_MODEL_PATH
+
 
 class CardiotoxicityModel:
     """
@@ -118,12 +120,11 @@ def get_model() -> CardiotoxicityModel:
     """Get or create the singleton model."""
     global _model
     if _model is None:
-        model_path = Path("backend/ml/models/xgb_model.pkl")
-        if model_path.exists():
-            _model = CardiotoxicityModel(str(model_path))
+        if XGB_MODEL_PATH.exists():
+            _model = CardiotoxicityModel(str(XGB_MODEL_PATH))
         else:
             raise FileNotFoundError(
-                f"Model not found: {model_path}. "
+                f"Model not found: {XGB_MODEL_PATH}. "
                 "Please run training first."
             )
     return _model

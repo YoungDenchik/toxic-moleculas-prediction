@@ -1,10 +1,16 @@
+"""
+UMAP Pipeline
+
+Projects molecules to UMAP space and predicts toxicity.
+"""
+
 from typing import Dict
 
-from backend.services.core_utils.standardization import standardize_smiles
-from backend.services.core_utils.mol import mol_from_canonical_smiles
-from backend.services.core_utils.features import build_feature_vector
-from backend.ml.umap_model import umap_projector
-from backend.ml.model import model
+from backend.services.molecule_service import (
+    process_smiles,
+    predict_toxicity,
+    project_to_umap,
+)
 
 
 def project_smiles_to_umap_with_prediction(smiles: str) -> Dict:
@@ -21,7 +27,7 @@ def project_smiles_to_umap_with_prediction(smiles: str) -> Dict:
     dict
         Contains ok, canonical_smiles, prediction (label + probability), x, y
     """
-    canonical, error = standardize_smiles(smiles)
+    mol_data, error = process_smiles(smiles)
 
     if error is not None:
         return {
@@ -29,29 +35,15 @@ def project_smiles_to_umap_with_prediction(smiles: str) -> Dict:
             "error": error,
         }
 
-    mol = mol_from_canonical_smiles(canonical)
-    if mol is None:
-        return {
-            "ok": False,
-            "error": "Failed to create molecule from SMILES",
-        }
-
-    # Build feature vector (returns numpy array of shape (1, n_features))
-    features = build_feature_vector(mol)
-
-    # Predict toxicity probability
-    prob = model.predict_proba(features)
-    label = "toxic" if prob >= 0.5 else "non-toxic"
-
-    # Project to UMAP space
-    x, y = umap_projector.transform(features)
+    prediction = predict_toxicity(mol_data.features)
+    x, y = project_to_umap(mol_data.features)
 
     return {
         "ok": True,
-        "canonical_smiles": canonical,
+        "canonical_smiles": mol_data.canonical_smiles,
         "prediction": {
-            "label": label,
-            "probability": prob,
+            "label": prediction.label,
+            "probability": prediction.probability,
         },
         "x": x,
         "y": y,

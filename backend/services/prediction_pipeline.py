@@ -1,13 +1,29 @@
+"""
+Prediction Pipeline
+
+Predicts cardiotoxicity from SMILES input.
+"""
+
 from typing import Dict
 
-from backend.services.core_utils.standardization import standardize_smiles
-from backend.services.core_utils.mol import mol_from_canonical_smiles
-from backend.services.core_utils.features import build_feature_vector
-from backend.ml.model import model
+from backend.services.molecule_service import process_smiles, predict_toxicity
 
 
 def predict_from_smiles(smiles: str) -> Dict:
-    canonical, error = standardize_smiles(smiles)
+    """
+    Predict cardiotoxicity from a SMILES string.
+
+    Parameters
+    ----------
+    smiles : str
+        Input SMILES string
+
+    Returns
+    -------
+    Dict
+        Contains ok, canonical_smiles, prediction (label + probability)
+    """
+    mol_data, error = process_smiles(smiles)
 
     if error is not None:
         return {
@@ -15,18 +31,13 @@ def predict_from_smiles(smiles: str) -> Dict:
             "error": error,
         }
 
-    mol = mol_from_canonical_smiles(canonical)
-
-    features = build_feature_vector(mol)
-
-    prob = model.predict_proba(features)
-    label = "toxic" if prob >= 0.5 else "non-toxic"
+    prediction = predict_toxicity(mol_data.features)
 
     return {
         "ok": True,
-        "canonical_smiles": canonical,
+        "canonical_smiles": mol_data.canonical_smiles,
         "prediction": {
-            "label": label,
-            "probability": prob,
+            "label": prediction.label,
+            "probability": prediction.probability,
         },
     }

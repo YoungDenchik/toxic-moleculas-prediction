@@ -6,12 +6,15 @@ FastAPI application for predicting cardiotoxicity from molecular SMILES.
 
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from backend.api import predict, chemical_space, properties, analyze, explain
 from backend.api.schemas import TrainingUmapPoint
 from backend.services.umap_data import load_umap_training_data
+from backend.config import CORS_ORIGINS
+from backend.exceptions import CardiotoxicityAPIError
 
 
 app = FastAPI(
@@ -20,10 +23,21 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
+@app.exception_handler(CardiotoxicityAPIError)
+async def cardiotoxicity_exception_handler(
+    _request: Request, exc: CardiotoxicityAPIError
+) -> JSONResponse:
+    """Handle custom API exceptions with proper status codes."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+    )
+
 # CORS middleware for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
